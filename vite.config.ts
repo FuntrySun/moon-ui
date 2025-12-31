@@ -7,6 +7,7 @@ import Components from "unplugin-vue-components/vite";
 import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import VueRouter from "unplugin-vue-router/vite";
 import { VueRouterAutoImports } from "unplugin-vue-router";
+import Layouts from "vite-plugin-vue-layouts";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -23,6 +24,10 @@ export default defineConfig(async () => ({
       extensions: ['.vue'],
       // 排除掉页面目录下的非页面资源，防止它们变成路由
       exclude: ['**/components/**', '**/composables/**', '**/assets/**'],
+    }),
+    Layouts({
+      layoutsDirs: 'src/layouts',
+      defaultLayout: 'default'
     }),
     vue(),
     UnoCSS(),

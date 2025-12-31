@@ -1,9 +1,12 @@
 <script setup lang="ts">
-// No script needed for now
+import { useTheme } from '@/hooks/useTheme'
+
+const { theme } = useTheme()
 </script>
 
 <template>
-  <n-config-provider>
+  <n-config-provider :theme="theme">
+    <n-global-style />
     <n-message-provider>
       <n-dialog-provider>
         <n-notification-provider>
@@ -17,38 +20,14 @@
 </template>
 
 <style>
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-}
-
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
 }
 
 #app {
-  width: 100%;
+  height: 100vh;
+  width: 100vw;
 }
 </style>
