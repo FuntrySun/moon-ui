@@ -11,47 +11,32 @@ async function greet() {
 </script>
 
 <template>
-  <div class="p-24">
-    <n-card title="欢迎使用 Moon UI" segmented>
-      <div class="flex flex-col items-center py-40">
-        <div class="flex justify-center mb-32">
-          <a href="https://vite.dev" target="_blank" class="hover:drop-shadow-[0_0_2em_#646CFF]">
-            <img src="/vite.svg" class="h-32 p-8" alt="Vite logo" />
-          </a>
-          <a href="https://tauri.app" target="_blank" class="hover:drop-shadow-[0_0_2em_#FFC131]">
-            <img src="/tauri.svg" class="h-32 p-8" alt="Tauri logo" />
-          </a>
-          <a href="https://vuejs.org/" target="_blank" class="hover:drop-shadow-[0_0_2em_#4FC08D]">
-            <img src="../assets/vue.svg" class="h-32 p-8" alt="Vue logo" />
-          </a>
-        </div>
+  <main class="flex-col-center pt-10vh">
+    <h1 class="text-3xl font-bold mb-8">Welcome to Tauri + Vue</h1>
 
-        <p class="mb-32 text-16 text-gray-500">
-          这是一个基于 Tauri 2.0 + Vue 3 + Naive UI 的现代化桌面应用模版
-        </p>
+    <div class="flex justify-center mb-8">
+      <a href="https://vite.dev" target="_blank" class="hover:drop-shadow-[0_0_2em_#747bff]">
+        <img src="/vite.svg" class="h-24 p-6 transition-duration-750" alt="Vite logo" />
+      </a>
+      <a href="https://tauri.app" target="_blank" class="hover:drop-shadow-[0_0_2em_#24c8db]">
+        <img src="/tauri.svg" class="h-24 p-6 transition-duration-750" alt="Tauri logo" />
+      </a>
+      <a href="https://vuejs.org/" target="_blank" class="hover:drop-shadow-[0_0_2em_#249b73]">
+        <img src="../assets/vue.svg" class="h-24 p-6 transition-duration-750" alt="Vue logo" />
+      </a>
+    </div>
 
-        <n-space vertical align="center" size="large">
-          <n-input-group>
-            <n-input v-model:value="name" placeholder="输入你的名字..." style="width: 240px" />
-            <n-button type="primary" @click="greet">打个招呼</n-button>
-          </n-input-group>
+    <p class="mb-8 text-gray-600">这是首页 (Root Page)</p>
 
-          <p v-if="greetMsg" class="text-18 font-bold text-primary animate-bounce-in">
-            {{ greetMsg }}
-          </p>
+    <form class="flex justify-center mb-8" @submit.prevent="greet">
+      <n-input id="greet-input" v-model:value="name" placeholder="Enter a name..." class="mr-2 w-64" />
+      <n-button type="primary" attr-type="submit">Greet</n-button>
+    </form>
 
-          <n-divider />
+    <div class="flex-center gap-4">
+      <n-button @click="$router.push('/about/about')">前往关于页面 (/about/about)</n-button>
+    </div>
 
-          <n-button @click="$router.push('/about/about')">
-            查看关于页面
-          </n-button>
-        </n-space>
-      </div>
-    </n-card>
-  </div>
+    <p class="mt-4 text-lg font-medium text-blue-500">{{ greetMsg }}</p>
+  </main>
 </template>
-
-<route lang="yaml">
-meta:
-  title: 仪表盘
-</route>
