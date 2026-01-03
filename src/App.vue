@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
 const { theme } = useTheme()
+const authStore = useAuthStore()
+
+// 应用启动时检查认证状态
+onMounted(() => {
+  authStore.checkAuth()
+})
 </script>
 
 <template>
@@ -43,8 +52,6 @@ const { theme } = useTheme()
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }

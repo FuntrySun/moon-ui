@@ -3,7 +3,8 @@ import VueHook from 'alova/vue'
 import adapterFetch from 'alova/fetch'
 import type { ResponseData } from './types'
 import { dialogManager } from '../sys'
-import { useAuthStore } from '../../store'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
 /**
  * alova 请求工具封装
@@ -14,6 +15,7 @@ import { useAuthStore } from '../../store'
  * 3. 统一处理业务逻辑错误码 (默认 200/0 为成功)
  * 4. 支持 TypeScript 类型定义
  * 5. 集成 VueHook 实现响应式请求
+ * 6. 自动处理 Token 过期（401 错误）并跳转登录页
  */
 export const alovaInstance = createAlova({
   // 基础路径，优先从环境变量获取
@@ -52,6 +54,20 @@ export const alovaInstance = createAlova({
     onSuccess: async (response: Response, method) => {
       // 1. 检查 HTTP 状态码
       if (!response.ok) {
+        // 处理 401 未授权错误
+        if (response.status === 401) {
+          await dialogManager.error('登录已过期，请重新登录')
+          const authStore = useAuthStore()
+          authStore.logout()
+          // 保存当前路径，登录后跳转回来
+          const currentPath = router.currentRoute.value.fullPath
+          router.push({
+            path: '/auth/login',
+            query: { redirect: currentPath }
+          })
+          throw new Error('登录已过期')
+        }
+        
         const errorMsg = `HTTP Error: ${response.status} ${response.statusText}`
         throw new Error(errorMsg)
       }
@@ -63,12 +79,18 @@ export const alovaInstance = createAlova({
       // 假设 200 或 0 是成功，其他都是错误
       const { code, message, data } = result
       if (code !== 200 && code !== 0) {
-        // 这里可以根据不同的 code 进行特殊处理，例如 401 跳转登录
+        // 处理业务层面的 401 错误
         if (code === 401) {
           await dialogManager.error('登录已过期，请重新登录')
-          // 使用 store 清理 token
           const authStore = useAuthStore()
-          authStore.clearToken()
+          authStore.logout()
+          // 保存当前路径，登录后跳转回来
+          const currentPath = router.currentRoute.value.fullPath
+          router.push({
+            path: '/auth/login',
+            query: { redirect: currentPath }
+          })
+          throw new Error('登录已过期')
         }
         throw new Error(message || '请求业务错误')
       }
@@ -83,7 +105,7 @@ export const alovaInstance = createAlova({
      */
     onError: (err, method) => {
       // 如果是业务逻辑中已经弹窗处理过的错误（如 401），则不再重复弹窗
-      if (err.message === '登录已过期，请重新登录') {
+      if (err.message === '登录已过期' || err.message === '登录已过期，请重新登录') {
         throw err
       }
       // 网络断开或超时

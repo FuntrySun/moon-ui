@@ -1,5 +1,5 @@
 <template>
-  <n-layout has-sider position="absolute">
+  <n-layout has-sider position="absolute" style="height: 100vh">
     <!-- 侧边栏模式下的 Sider -->
     <n-layout-sider
       v-if="navMode === 'sider'"
@@ -25,7 +25,7 @@
       />
     </n-layout-sider>
 
-    <n-layout>
+    <n-layout style="height: 100%" content-style="display: flex; flex-direction: column; min-height: 100%">
       <n-layout-header bordered class="h-64px flex items-center justify-between px-24px">
         <div class="flex items-center gap-24px">
           <!-- 顶部模式下的 Logo -->
@@ -43,10 +43,25 @@
           />
 
           <!-- 面包屑 (仅侧边栏模式显示) -->
-          <n-breadcrumb v-if="navMode === 'sider'">
-            <n-breadcrumb-item>首页</n-breadcrumb-item>
-            <n-breadcrumb-item v-if="route.path !== '/'">{{ route.name }}</n-breadcrumb-item>
-          </n-breadcrumb>
+          <div 
+            v-if="navMode === 'sider'" 
+            class="flex items-center bg-gray-100/60 dark:bg-white/5 px-16px py-6px rounded-8px border border-gray-200/50 dark:border-white/10 transition-all duration-300 hover:shadow-md"
+          >
+            <n-breadcrumb>
+              <n-breadcrumb-item>
+                <div class="flex items-center gap-4px">
+                  <div class="i-carbon-home text-14px" />
+                  <span>首页</span>
+                </div>
+              </n-breadcrumb-item>
+              <n-breadcrumb-item v-if="route.path !== '/'">
+                <div class="flex items-center gap-4px">
+                  <div class="i-carbon-document text-14px" />
+                  <span>{{ route.name }}</span>
+                </div>
+              </n-breadcrumb-item>
+            </n-breadcrumb>
+          </div>
         </div>
         <div class="flex items-center gap-12px">
           <!-- 布局切换 -->
@@ -54,7 +69,7 @@
             <template #trigger>
               <n-button quaternary circle @click="toggleNavMode">
                 <template #icon>
-                  <div :class="navMode === 'sider' ? 'i-solar-side-menu-linear' : 'i-solar-hamburger-menu-linear'" class="text-20px" />
+                  <div :class="navMode === 'sider' ? 'i-carbon-side-panel-open' : 'i-carbon-menu'" class="text-20px" />
                 </template>
               </n-button>
             </template>
@@ -66,7 +81,7 @@
             <template #trigger>
               <n-button quaternary circle @click="toggleTheme">
                 <template #icon>
-                  <div :class="isDark ? 'i-solar-moon-linear' : 'i-solar-sun-2-linear'" class="text-20px" />
+                  <div :class="isDark ? 'i-carbon-moon' : 'i-carbon-sun'" class="text-20px" />
                 </template>
               </n-button>
             </template>
@@ -78,7 +93,7 @@
             <template #trigger>
               <n-button quaternary circle @click="handleSettings">
                 <template #icon>
-                  <div class="i-solar-settings-linear text-20px" />
+                  <div class="i-carbon-settings text-20px" />
                 </template>
               </n-button>
             </template>
@@ -86,12 +101,18 @@
           </n-tooltip>
 
           <!-- 用户头像 -->
-          <n-dropdown :options="userOptions">
-            <n-avatar round size="small" src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" class="cursor-pointer ml-4px" />
+          <n-dropdown :options="userOptions" @select="handleUserMenuSelect">
+            <n-avatar 
+              round 
+              size="small" 
+              class="cursor-pointer ml-4px"
+            >
+              <div class="i-carbon-user-avatar-filled" />
+            </n-avatar>
           </n-dropdown>
         </div>
       </n-layout-header>
-      <n-layout-content content-style="padding: 24px;" :native-scrollbar="false">
+      <n-layout-content content-style="padding: 24px; flex: 1" :native-scrollbar="false">
         <router-view v-slot="{ Component }">
           <transition name="fade-slide" mode="out-in">
             <component :is="Component" />
@@ -109,14 +130,17 @@
 import { ref, h, computed } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
 import type { MenuOption } from 'naive-ui'
-import { useMessage } from 'naive-ui'
+import { useMessage, useDialog } from 'naive-ui'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
 const message = useMessage()
+const dialog = useDialog()
 const { isDark, toggleTheme } = useTheme()
+const authStore = useAuthStore()
 
-const collapsed = ref(false)
+const collapsed = ref(true)
 const navMode = ref<'sider' | 'top'>('sider')
 const activeKey = computed(() => route.path)
 
@@ -131,6 +155,25 @@ const handleSettings = () => {
   message.info('系统设置功能开发中...')
 }
 
+/** 处理用户菜单点击 */
+const handleUserMenuSelect = (key: string) => {
+  if (key === 'logout') {
+    dialog.warning({
+      title: '确认登出',
+      content: '确定要退出登录吗？',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: () => {
+        authStore.logout()
+        message.success('已退出登录')
+        router.push('/auth/login')
+      }
+    })
+  } else if (key === 'profile') {
+    message.info('个人中心功能开发中...')
+  }
+}
+
 function renderIcon(iconClass: string) {
   return () => h('div', { class: `${iconClass} text-20px` })
 }
@@ -139,19 +182,51 @@ const menuOptions: MenuOption[] = [
   {
     label: () => h(RouterLink, { to: '/' }, { default: () => '仪表盘' }),
     key: '/',
-    icon: renderIcon('i-solar-widget-2-linear')
+    icon: renderIcon('i-carbon-dashboard')
   },
   {
-    label: () => h(RouterLink, { to: '/about' }, { default: () => '关于项目' }),
-    key: '/about',
-    icon: renderIcon('i-solar-info-circle-linear')
+    label: () => h(RouterLink, { to: '/about/about' }, { default: () => '关于项目' }),
+    key: '/about/about',
+    icon: renderIcon('i-carbon-information')
   }
 ]
 
-const userOptions = [
-  { label: '个人中心', key: 'profile' },
-  { label: '退出登录', key: 'logout' }
-]
+// 用户下拉菜单选项
+const userOptions = computed(() => {
+  if (authStore.isAuthenticated) {
+    return [
+      { 
+        label: authStore.currentUser?.username || '用户',
+        key: 'username',
+        disabled: true
+      },
+      { type: 'divider' },
+      { 
+        label: '个人中心',
+        key: 'profile',
+        icon: renderIcon('i-carbon-user')
+      },
+      { 
+        label: '退出登录',
+        key: 'logout',
+        icon: renderIcon('i-carbon-logout')
+      }
+    ]
+  } else {
+    return [
+      {
+        label: '登录',
+        key: 'login',
+        icon: renderIcon('i-carbon-login')
+      },
+      {
+        label: '注册',
+        key: 'register',
+        icon: renderIcon('i-carbon-user-follow')
+      }
+    ]
+  }
+})
 </script>
 
 <style scoped>

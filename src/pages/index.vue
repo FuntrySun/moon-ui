@@ -35,6 +35,12 @@ async function greet() {
 
     <div class="flex-center gap-4">
       <n-button @click="$router.push('/about/about')">前往关于页面 (/about/about)</n-button>
+      <n-button type="primary" @click="$router.push('/auth/login')">
+        <template #icon>
+          <div class="i-carbon-login" />
+        </template>
+        前往登录页面
+      </n-button>
     </div>
 
     <p class="mt-4 text-lg font-medium text-blue-500">{{ greetMsg }}</p>

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BlankLayout from '@/layouts/BlankLayout.vue'
+import { useAuthStore } from '@/stores/auth'
 
 // 增强路由，注入布局组件
 function setupLayouts(routes: readonly any[]) {
@@ -34,6 +35,43 @@ function setupLayouts(routes: readonly any[]) {
 const router = createRouter({
   history: createWebHistory(),
   routes: setupLayouts(routes),
+})
+
+// 全局路由守卫
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  
+  // 公开页面列表（不需要登录）
+  const publicPages = ['/auth/login', '/auth/register']
+  const isPublicPage = publicPages.includes(to.path)
+  
+  // 检查是否需要认证（默认所有页面都需要认证，除非明确指定）
+  const requiresAuth = to.meta.requiresAuth !== false
+  
+  // 如果是公开页面
+  if (isPublicPage) {
+    // 已登录用户访问登录/注册页，重定向到首页
+    if (authStore.isAuthenticated) {
+      next('/')
+    } else {
+      next()
+    }
+    return
+  }
+  
+  // 如果页面需要认证但用户未登录
+  if (requiresAuth && !authStore.isAuthenticated) {
+    // 保存原访问路径，登录成功后跳转回来
+    const redirect = to.fullPath
+    next({
+      path: '/auth/login',
+      query: { redirect }
+    })
+    return
+  }
+  
+  // 其他情况正常放行
+  next()
 })
 
 export default router
