@@ -21,6 +21,7 @@
     "@tauri-apps/plugin-shell": "^2.3.3",
     "@vicons/ionicons5": "^0.13.0",
     "alova": "^3.4.1",
+    "echarts": "^6.0.0",
     "naive-ui": "^2.43.2",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",

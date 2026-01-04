@@ -1,3 +1,8 @@
+---
+description: 
+globs:
+alwaysApply: true
+---
 # Moon UI 项目开发规范
 
 本文档旨在统一 Moon UI 项目的开发习惯，涵盖目录结构、组件封装、页面创建及静态资源管理等核心准则。

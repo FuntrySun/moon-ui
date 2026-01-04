@@ -45,19 +45,19 @@
           <!-- 面包屑 (仅侧边栏模式显示) -->
           <div 
             v-if="navMode === 'sider'" 
-            class="flex items-center bg-gray-100/60 dark:bg-white/5 px-16px py-6px rounded-8px border border-gray-200/50 dark:border-white/10 transition-all duration-300 hover:shadow-md"
+            class="flex items-center bg-white/40 dark:bg-white/5 backdrop-blur-md px-16px py-6px rounded-12px border border-white/60 dark:border-white/10 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-white/60 dark:hover:bg-white/10"
           >
             <n-breadcrumb>
               <n-breadcrumb-item>
-                <div class="flex items-center gap-4px">
-                  <div class="i-carbon-home text-14px" />
-                  <span>首页</span>
+                <div class="flex items-center gap-6px text-gray-500 dark:text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                  <div class="i-carbon-home text-16px" />
+                  <span class="text-13px font-medium">首页</span>
                 </div>
               </n-breadcrumb-item>
               <n-breadcrumb-item v-if="route.path !== '/'">
-                <div class="flex items-center gap-4px">
-                  <div class="i-carbon-document text-14px" />
-                  <span>{{ route.name }}</span>
+                <div class="flex items-center gap-6px text-gray-800 dark:text-gray-200">
+                  <div class="i-carbon-tag text-14px text-primary/80" />
+                  <span class="text-13px font-semibold">{{ route.name }}</span>
                 </div>
               </n-breadcrumb-item>
             </n-breadcrumb>
